@@ -4,21 +4,94 @@
 }
 
 .headerContainer {
-  border: 1px solid black;
   display: flex;
   justify-content: space-around;
   height: 70px;
   align-items: center;
 }
+
 .headerLink {
   display: flex;
-  border: 1px solid black;
-  width: 400px;
+  width: 500px;
   justify-content: space-evenly;
   align-items: center;
 }
+.headerLink input {
+  height: 25px;
+  border-radius: 10px;
+  border-color: salmon;
+  border-style: solid;
+}
+.headerLink button {
+  padding: 5px;
+  margin-left: 10px;
+  background-color: rgb(122, 251, 122);
+  font-size: 15px;
+  font-weight: lighter;
+  letter-spacing: 1px;
+  width: 100px;
+  border-style: none;
+  border-radius: 10px;
+}
+.headerLink a {
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+}
+/* news component styles below */
 .newsContainer {
-  border: 1px solid black;
   min-height: 90vh;
   width: 100%;
+}
+
+/* weather component styles below  */
+.weatherContainer {
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(251, 230, 246, 0.492), rgb(231, 245, 255));
+}
+.weatherDataContainer {
+  min-height: 70vh;
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  background: linear-gradient(
+    rgba(173, 216, 230, 0.675),
+    rgba(255, 154, 255, 0.686)
+  );
+  border-radius: 20px;
+  box-shadow: 0px 0px 100px rgba(155, 145, 247, 0.666);
+}
+.weatherDataContainer p {
+  letter-spacing: 3px;
+  font-weight: lighter;
+  font-size: 25px;
+  margin-top: 10px;
+  max-width: 400px;
+}
+.currentData {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.currentData p {
+  max-width: 500px;
+}
+.locationData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 30%;
+}
+.locationData p {
+  width: 100%;
+}
+.condition {
+  display: flex;
+  align-items: center;
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import ReactPaginate from "react-paginate";
 
 const News = ({ pageCount, changePage, displayNews }) => {

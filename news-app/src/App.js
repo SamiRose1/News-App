@@ -1,13 +1,32 @@
 import "./App.css";
 import Header from "./Components/Header";
 import News from "./Components/News";
-import ReactPaginate from "react-paginate";
+import Weather from "./Components/Weather";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+
 import { useState, useReducer, useRef, useEffect } from "react";
+import ReactPaginate from "react-paginate";
 
 function App() {
   const [newsData, setNewsData] = useState([]);
   const [weatherData, setweatherData] = useState([]);
-
+  const [weatherCity, setWeatherCity] = useState("edmonton");
+  const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState({
+    newsSearch: "",
+    weatherSearch: "",
+  });
+  useEffect(() => {
+    document.querySelector(".input").setAttribute("name", "newsSearch");
+    navigate("/");
+  }, []);
   useEffect(() => {
     const fetchNews = async () => {
       const api = await fetch(
@@ -21,13 +40,15 @@ function App() {
       }
     };
 
-    fetchNews();
+    // fetchNews();
     // api key for Gnews fcb3d604f8dd7d68bdc2bd6e460d0f28
     // for headlines https://gnews.io/api/v4/top-headlines?token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en
+
     //to search https://gnews.io/api/v4/search?q=russia&token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en
     ////////////////////////////////////
 
     // fetching weather data
+
     const options = {
       method: "GET",
       headers: {
@@ -37,24 +58,22 @@ function App() {
     };
 
     fetch(
-      "https://weatherapi-com.p.rapidapi.com/current.json?q=kampala",
+      `https://weatherapi-com.p.rapidapi.com/current.json?q=${weatherCity}`,
       options
     )
       .then((response) => response.json())
-      .then((response) => setweatherData([response]))
+      .then((response) => setweatherData(response))
       .catch((err) => console.error(err));
-  }, []);
+  }, [weatherCity]);
 
-  console.log(newsData);
   //fetch the data for both news and weather
   //done
   //set the pagination
-
-  //pagination
+  //done
+  //pagination for news starts here
   const [pageNumber, setPageNumber] = useState(0);
   const newsPerPage = 5;
   const pagesVisited = pageNumber * newsPerPage;
-  console.log(newsData);
   const displayNews = newsData
     ? newsData
         .slice(pagesVisited, pagesVisited + newsPerPage)
@@ -84,16 +103,86 @@ function App() {
 
   //display the data for the news
   // fetchData();
+  //mapping the weather data below
+  let current, location;
+  if (weatherData.length !== 0) {
+    current = weatherData.current;
+    location = weatherData.location;
+  }
+  //handling search inputs
+  let inputName;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    inputName = name;
+    setSearchInput(() => {
+      return {
+        [name]: value,
+      };
+    });
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (searchInput.weatherSearch) {
+      setWeatherCity(searchInput.weatherSearch);
+    }
+    if (searchInput.newsSearch) {
+      console.log("handle news search");
+    }
+    setSearchInput(() => {
+      return {
+        newsSearch: "",
+        weatherSearch: "",
+      };
+    });
+  };
+  const handleHeaderLinkClick = (e) => {
+    switch (e.target.className) {
+      case "newsLink":
+        console.log("newsLink");
+        document.querySelector(".input").setAttribute("name", "newsSearch");
+        console.log(document.querySelector(".input"));
+
+        break;
+      case "weatherLink":
+        console.log("weatherLink");
+        document.querySelector(".input").setAttribute("name", "weatherSearch");
+        console.log(document.querySelector(".input"));
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="App">
-      <Header />
-      <News
-        newsData={newsData}
-        pageCount={pageCount}
-        changePage={changePage}
-        displayNews={displayNews}
+      <Header
+        handleHeaderLinkClick={handleHeaderLinkClick}
+        searchInput={searchInput.newsSearch}
+        setSearchInput={setSearchInput}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
       />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <News
+              pageCount={pageCount}
+              changePage={changePage}
+              displayNews={displayNews}
+            />
+          }
+        />
+        <Route
+          path="news/weather"
+          element={
+            <Weather
+              weatherData={weatherData}
+              location={location}
+              current={current}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
 }
