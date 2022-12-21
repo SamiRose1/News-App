@@ -14,8 +14,8 @@ function App() {
         "https://gnews.io/api/v4/top-headlines?token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en"
       );
       const parse = await api.json();
-      if (api) {
-        return setNewsData([parse]);
+      if (parse) {
+        setNewsData(parse?.articles?.slice(0, 6));
       } else {
         console.log("still loading");
       }
@@ -44,28 +44,56 @@ function App() {
       .then((response) => setweatherData([response]))
       .catch((err) => console.error(err));
   }, []);
+
+  console.log(newsData);
   //fetch the data for both news and weather
   //done
   //set the pagination
-  let articles;
 
-  const [news, setNews] = useState(articles);
-  useEffect(() => {
-    if (newsData.length !== 0) {
-      console.log(newsData);
-      articles = newsData[0].articles;
-      console.log(articles);
-    }
-  }, [newsData]);
+  //pagination
+  const [pageNumber, setPageNumber] = useState(0);
+  const newsPerPage = 5;
+  const pagesVisited = pageNumber * newsPerPage;
+  console.log(newsData);
+  const displayNews = newsData
+    ? newsData
+        .slice(pagesVisited, pagesVisited + newsPerPage)
+        .map((article) => {
+          return (
+            <div className="newsArticle">
+              <h3 className="title" key={new Date().getMilliseconds()}>
+                {article.title}
+              </h3>
+              <img src={article.image} alt="" />
+              <h2 className="description">{article.description}</h2>
+              <p>{article.source.name}</p>
+              <p>{article.source.url}</p>
+            </div>
+          );
+        })
+    : console.log("not working");
+
+  const pageCount = Math.ceil(newsData?.length / newsPerPage);
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
+  ///pagination stops here
+
+  //////////////
 
   //display the data for the news
   // fetchData();
-  console.log(newsData);
 
   return (
     <div className="App">
       <Header />
-      {/* <News newsData={newsData} /> */}
+      <News
+        newsData={newsData}
+        pageCount={pageCount}
+        changePage={changePage}
+        displayNews={displayNews}
+      />
     </div>
   );
 }
