@@ -12,7 +12,6 @@ import {
 } from "react-router-dom";
 
 import { useState, useReducer, useRef, useEffect } from "react";
-
 import ReactPaginate from "react-paginate";
 
 const reduce = (state, action) => {
@@ -45,29 +44,6 @@ function App() {
   const [weatherCity, setWeatherCity] = useState("edmonton");
   const [defaultNews, setDefaultNews] = useState("top-headlines?");
   const [headerResponse, setHeaderResponse] = useState(false);
-  const [state, dispatch] = useReducer(reduce, {
-    newsData: [],
-    weatherData: [],
-    weatherCity: "edmonton",
-    defaultNews: "top-headlines?",
-    headerResponse: false,
-    pageNumber: 0,
-    inputName: "",
-    searchInput: {
-      newsSearch: "",
-      weatherSearch: "",
-    },
-  });
-  const ACTIONS = {
-    newsData: "NEWSDATA",
-    weatherData: "WEATHERDATA",
-    weatherCity: "WEATHERCITY",
-    defaultNews: "DEFAULTNEWS",
-    headerResponse: "HEADERRESPONSE",
-    pageNumber: "PAGENUMBER",
-    inputNumber: "INPUTNAME",
-    searchInput: "SEARCHINPUT",
-  };
 
   const handleResponse = () => {
     setHeaderResponse(() => !headerResponse);
@@ -97,18 +73,18 @@ function App() {
   useEffect(() => {
     const fetchNews = async () => {
       const api = await fetch(
-        `https://gnews.io/api/v4/${state.defaultNews}token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en`
+        `https://gnews.io/api/v4/${defaultNews}token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en`
       );
       const parse = await api.json();
       if (parse) {
         console.log(parse);
-        dispatch({ type: "NEWSDATA", payload: parse?.articles?.slice(0, 10) });
+        setNewsData(parse?.articles?.slice(0, 10));
       } else {
         console.log("still loading");
       }
     };
 
-    fetchNews();
+    // fetchNews();
     // api key for Gnews fcb3d604f8dd7d68bdc2bd6e460d0f28
     // for headlines https://gnews.io/api/v4/top-headlines?token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en
 
@@ -132,7 +108,7 @@ function App() {
       .then((response) => response.json())
       .then((response) => dispatch({ type: "WEATHERDATA", payload: response }))
       .catch((err) => console.error(err));
-  }, [defaultNews, weatherCity]);
+  }, [weatherCity]);
 
   //fetch the data for both news and weather
   //done
@@ -140,7 +116,7 @@ function App() {
   //done
   //pagination for news starts here
   const [pageNumber, setPageNumber] = useState(0);
-  const newsPerPage = 6;
+  const newsPerPage = 5;
   const pagesVisited = pageNumber * newsPerPage;
   const displayNews = state.newsData
     ? state.newsData
@@ -153,13 +129,8 @@ function App() {
               </h3>
               <img src={article.image} alt="" />
               <h2 className="description">{article.description}</h2>
-              <p className="sourceLink">{article.source.name}</p>
-              <p className="readMoreLink">
-                read more-
-                <a href={article.source.url} target="_blank">
-                  {article.source.url}
-                </a>
-              </p>
+              <p>{article.source.name}</p>
+              <p>{article.source.url}</p>
             </div>
           );
         })
@@ -185,18 +156,11 @@ function App() {
     location = weatherData.location;
   }
   //handling search inputs
-  const [inputName, setInputName] = useState();
+  let inputName;
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputName(name);
-    dispatch({ type: "INPUTNAME", payload: name });
     console.log(inputName);
-    dispatch({
-      type: "SEARCHINPUT",
-      payload: {
-        [name]: value,
-      },
-    });
     setSearchInput(() => {
       return {
         [name]: value,
@@ -205,15 +169,10 @@ function App() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(searchInput);
     if (searchInput.weatherSearch) {
       setWeatherCity(searchInput.weatherSearch);
     }
     if (searchInput.newsSearch) {
-      dispatch({
-        type: "DEFAULTNEWS",
-        payload: `search?q=${searchInput.newsSearch}&`,
-      });
       setDefaultNews(`search?q=${searchInput.newsSearch}&`);
     }
     dispatch({
@@ -231,15 +190,19 @@ function App() {
     });
   };
   const handleHeaderLinkClick = (e) => {
-    console.log(e.target.className);
+    switch (e.target.className) {
+      case "newsLink":
+        console.log("newsLink");
+        document.querySelector(".input").setAttribute("name", "newsSearch");
+        console.log(document.querySelector(".input"));
 
-    const className = e.target.className;
-    console.log(className.includes("newsLink"));
-    if (className.includes("newsLink")) {
-      document?.querySelector(".input").setAttribute("name", "newsSearch");
-    }
-    if (className.includes("weatherLink")) {
-      document?.querySelector(".input").setAttribute("name", "weatherSearch");
+        break;
+      case "weatherLink":
+        console.log("weatherLink");
+        document.querySelector(".input").setAttribute("name", "weatherSearch");
+        console.log(document.querySelector(".input"));
+      default:
+        break;
     }
   };
 
@@ -251,7 +214,7 @@ function App() {
         setSearchInput={state.searchInput}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
-        headerResponse={state.headerResponse}
+        headerResponse={headerResponse}
         handleResponse={handleResponse}
       />
       <Routes>
