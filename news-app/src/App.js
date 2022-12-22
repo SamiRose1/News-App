@@ -15,13 +15,59 @@ import { useState, useReducer, useRef, useEffect } from "react";
 
 import ReactPaginate from "react-paginate";
 
+const reduce = (state, action) => {
+  switch (action.type) {
+    case "NEWSDATA":
+      return [...state, { newsData: action.payload }];
+
+      break;
+    case "WEATHERDATA":
+      return [state, { weatherData: action.payload }];
+    case "WEATHERCITY":
+      return [...state, { weatherCity: action.payLoad }];
+    case "DEFAULTNEWS":
+      return [...state, { defaultNews: action.payLoad }];
+    case "HEADERRESPONE":
+      return [...state, { headerResponse: action.payLoad }];
+    case "PAGENUMBER":
+      return [...state, { pageNumber: action.payLoad }];
+    case "INPUTNAME":
+      return [...state, { inputName: action.pageCount }];
+    case "SEARCHINPUT":
+      return [...state, { pageCount: action.pageCount }];
+    default:
+      break;
+  }
+};
+
 function App() {
   const [newsData, setNewsData] = useState([]);
   const [weatherData, setweatherData] = useState([]);
   const [weatherCity, setWeatherCity] = useState("edmonton");
   const [defaultNews, setDefaultNews] = useState("top-headlines?");
   const [headerResponse, setHeaderResponse] = useState(false);
-
+  const [state, dispatch] = useReducer(reduce, {
+    newsData: [],
+    weatherData: [],
+    weatherCity: "edmonton",
+    defaultNews: "top-headlines?",
+    headerResponse: false,
+    pageNumber: 0,
+    inputName: "",
+    searchInput: {
+      newsSearch: "",
+      weatherSearch: "",
+    },
+  });
+  const ACTIONS = {
+    newsData: "NEWSDATA",
+    weatherCity: "WEATHERCITY",
+    defaultNews: "DEFAULTNEWS",
+    headerResponse: "HEADERRESPONSE",
+    pageNumber: "PAGENUMBER",
+    inputNumber: "INPUTNAME",
+    searchInput: "SEARCHINPUT",
+  };
   const handleResponse = () => {
     setHeaderResponse(() => !headerResponse);
     if (headerResponse) {
@@ -55,6 +101,7 @@ function App() {
       const parse = await api.json();
       if (parse) {
         console.log(parse);
+        dispatch({ type: "NEWSDATA", payload: parse?.articles?.sclice(0.1) });
         setNewsData(parse?.articles?.slice(0, 10));
       } else {
         console.log("still loading");
@@ -83,7 +130,7 @@ function App() {
       options
     )
       .then((response) => response.json())
-      .then((response) => setweatherData(response))
+      .then((response) => dispatch({ type: "WEATHERDATA", payLoad: response }))
       .catch((err) => console.error(err));
   }, [defaultNews, weatherCity]);
 
@@ -95,8 +142,8 @@ function App() {
   const [pageNumber, setPageNumber] = useState(0);
   const newsPerPage = 6;
   const pagesVisited = pageNumber * newsPerPage;
-  const displayNews = newsData
-    ? newsData
+  const displayNews = state.newsData
+    ? state.newsData
         .slice(pagesVisited, pagesVisited + newsPerPage)
         .map((article) => {
           return (
@@ -120,6 +167,7 @@ function App() {
 
   const pageCount = Math.ceil(newsData?.length / newsPerPage);
   const changePage = ({ selected }) => {
+    dispatch({ type: "PAGENUMBER", payload: selected });
     setPageNumber(selected);
   };
 
@@ -131,7 +179,8 @@ function App() {
   // fetchData();
   //mapping the weather data below
   let current, location;
-  if (weatherData.length !== 0) {
+  console.log(state);
+  if (state?.weatherData?.length !== 0) {
     current = weatherData.current;
     location = weatherData.location;
   }
@@ -140,7 +189,14 @@ function App() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputName(name);
+    dispatch({ type: "INPUTNAME", payload: name });
     console.log(inputName);
+    dispatch({
+      type: "SEARCHINPUT",
+      payload: {
+        [name]: value,
+      },
+    });
     setSearchInput(() => {
       return {
         [name]: value,
@@ -154,8 +210,19 @@ function App() {
       setWeatherCity(searchInput.weatherSearch);
     }
     if (searchInput.newsSearch) {
+      dispatch({
+        type: "DEFAULTNEWS",
+        payload: `search?q=${searchInput.newsSearch}&`,
+      });
       setDefaultNews(`search?q=${searchInput.newsSearch}&`);
     }
+    dispatch({
+      type: "SEARCHINPUT",
+      payload: {
+        newsSearch: "",
+        weatherSearch: "",
+      },
+    });
     setSearchInput(() => {
       return {
         newsSearch: "",
@@ -180,11 +247,11 @@ function App() {
     <div className="App">
       <Header
         handleHeaderLinkClick={handleHeaderLinkClick}
-        searchInput={searchInput.newsSearch}
-        setSearchInput={setSearchInput}
+        searchInput={state.newsSearch}
+        setSearchInput={state.searchInput}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
-        headerResponse={headerResponse}
+        headerResponse={state.headerResponse}
         handleResponse={handleResponse}
       />
       <Routes>
@@ -202,7 +269,7 @@ function App() {
           path="news/weather"
           element={
             <Weather
-              weatherData={weatherData}
+              weatherData={state.weatherData}
               location={location}
               current={current}
             />
