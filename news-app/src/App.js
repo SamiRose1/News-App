@@ -12,12 +12,32 @@ import {
 } from "react-router-dom";
 
 import { useState, useReducer, useRef, useEffect } from "react";
+
 import ReactPaginate from "react-paginate";
 
 function App() {
   const [newsData, setNewsData] = useState([]);
   const [weatherData, setweatherData] = useState([]);
   const [weatherCity, setWeatherCity] = useState("edmonton");
+  const [defaultNews, setDefaultNews] = useState("top-headlines?");
+  const [headerResponse, setHeaderResponse] = useState(false);
+
+  const handleResponse = () => {
+    setHeaderResponse(() => !headerResponse);
+    if (headerResponse) {
+      document.querySelector(".headerContainer").classList.remove("expand");
+      document.querySelector(".weatherLink").classList.remove("align");
+      document.querySelector(".newsLink").classList.remove("align");
+      document.querySelector(".form").classList.remove("align");
+    } else if (!headerResponse) {
+      //////////
+      document.querySelector(".weatherLink").classList.add("align");
+      document.querySelector(".newsLink").classList.add("align");
+      document.querySelector(".form").classList.add("align");
+      document.querySelector(".headerContainer").classList.add("expand");
+    }
+  };
+
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState({
     newsSearch: "",
@@ -30,17 +50,18 @@ function App() {
   useEffect(() => {
     const fetchNews = async () => {
       const api = await fetch(
-        "https://gnews.io/api/v4/top-headlines?token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en"
+        `https://gnews.io/api/v4/${defaultNews}token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en`
       );
       const parse = await api.json();
       if (parse) {
-        setNewsData(parse?.articles?.slice(0, 6));
+        console.log(parse);
+        setNewsData(parse?.articles?.slice(0, 10));
       } else {
         console.log("still loading");
       }
     };
 
-    // fetchNews();
+    fetchNews();
     // api key for Gnews fcb3d604f8dd7d68bdc2bd6e460d0f28
     // for headlines https://gnews.io/api/v4/top-headlines?token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en
 
@@ -64,7 +85,7 @@ function App() {
       .then((response) => response.json())
       .then((response) => setweatherData(response))
       .catch((err) => console.error(err));
-  }, [weatherCity]);
+  }, [defaultNews, weatherCity]);
 
   //fetch the data for both news and weather
   //done
@@ -72,7 +93,7 @@ function App() {
   //done
   //pagination for news starts here
   const [pageNumber, setPageNumber] = useState(0);
-  const newsPerPage = 5;
+  const newsPerPage = 6;
   const pagesVisited = pageNumber * newsPerPage;
   const displayNews = newsData
     ? newsData
@@ -85,8 +106,13 @@ function App() {
               </h3>
               <img src={article.image} alt="" />
               <h2 className="description">{article.description}</h2>
-              <p>{article.source.name}</p>
-              <p>{article.source.url}</p>
+              <p className="sourceLink">{article.source.name}</p>
+              <p className="readMoreLink">
+                read more-
+                <a href={article.source.url} target="_blank">
+                  {article.source.url}
+                </a>
+              </p>
             </div>
           );
         })
@@ -110,10 +136,11 @@ function App() {
     location = weatherData.location;
   }
   //handling search inputs
-  let inputName;
+  const [inputName, setInputName] = useState();
   const handleChange = (e) => {
     const { name, value } = e.target;
-    inputName = name;
+    setInputName(name);
+    console.log(inputName);
     setSearchInput(() => {
       return {
         [name]: value,
@@ -122,11 +149,12 @@ function App() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(searchInput);
     if (searchInput.weatherSearch) {
       setWeatherCity(searchInput.weatherSearch);
     }
     if (searchInput.newsSearch) {
-      console.log("handle news search");
+      setDefaultNews(`search?q=${searchInput.newsSearch}&`);
     }
     setSearchInput(() => {
       return {
@@ -136,19 +164,15 @@ function App() {
     });
   };
   const handleHeaderLinkClick = (e) => {
-    switch (e.target.className) {
-      case "newsLink":
-        console.log("newsLink");
-        document.querySelector(".input").setAttribute("name", "newsSearch");
-        console.log(document.querySelector(".input"));
+    console.log(e.target.className);
 
-        break;
-      case "weatherLink":
-        console.log("weatherLink");
-        document.querySelector(".input").setAttribute("name", "weatherSearch");
-        console.log(document.querySelector(".input"));
-      default:
-        break;
+    const className = e.target.className;
+    console.log(className.includes("newsLink"));
+    if (className.includes("newsLink")) {
+      document?.querySelector(".input").setAttribute("name", "newsSearch");
+    }
+    if (className.includes("weatherLink")) {
+      document?.querySelector(".input").setAttribute("name", "weatherSearch");
     }
   };
 
@@ -160,6 +184,8 @@ function App() {
         setSearchInput={setSearchInput}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
+        headerResponse={headerResponse}
+        handleResponse={handleResponse}
       />
       <Routes>
         <Route
