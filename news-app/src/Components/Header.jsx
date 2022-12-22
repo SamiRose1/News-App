@@ -1,7 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Cancel from "../Components/cancel.png";
-import Expand from "../Components/expand.png";
 
 const Header = ({
   handleHeaderLinkClick,
@@ -9,27 +7,18 @@ const Header = ({
   setSearchInput,
   handleChange,
   handleSubmit,
-  headerResponse,
-  handleResponse,
 }) => {
   return (
     <header className="headerContainer">
       <img src="logo" alt="logo" />
       <section className="headerLink" onClick={handleHeaderLinkClick}>
-        <img
-          className="headerResponseActions"
-          src={headerResponse ? Cancel : Expand}
-          alt=""
-          onClick={() => handleResponse()}
-        />
         <Link to="/" className="newsLink">
           News
         </Link>
         <Link to="news/weather" className="weatherLink">
           Weather
         </Link>
-
-        <form onSubmit={handleSubmit} className="form">
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
             className="input"

@@ -4,10 +4,8 @@ import ReactPaginate from "react-paginate";
 const News = ({ pageCount, changePage, displayNews }) => {
   return (
     <article className="newsContainer">
-      <div className="news" key={new Date().getMilliseconds()}>
+      <div className="news">
         {displayNews}
-      </div>
-      <span>
         <ReactPaginate
           previousLabel={"Previous"}
           nextLabel={"Next"}
@@ -19,7 +17,7 @@ const News = ({ pageCount, changePage, displayNews }) => {
           disabledClassName={"paginationDisabled"}
           activeClassName={"paginationActive"}
         />
-      </span>
+      </div>
     </article>
   );
 };

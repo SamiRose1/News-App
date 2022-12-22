@@ -18,23 +18,22 @@ import ReactPaginate from "react-paginate";
 const reduce = (state, action) => {
   switch (action.type) {
     case "NEWSDATA":
-      return [...state, { newsData: action.payload }];
-
-      break;
+      return [state, { newsData: action.payload }];
     case "WEATHERDATA":
-      return [state, { weatherData: action.payload }];
+      return [...state, { weatherData: action.payload }];
+
     case "WEATHERCITY":
-      return [...state, { weatherCity: action.payLoad }];
+      return [state, { weatherCity: action.payload }];
     case "DEFAULTNEWS":
-      return [...state, { defaultNews: action.payLoad }];
+      return [...state, { defaultNews: action.payload }];
     case "HEADERRESPONE":
-      return [...state, { headerResponse: action.payLoad }];
+      return [...state, { headerResponse: action.payload }];
     case "PAGENUMBER":
-      return [...state, { pageNumber: action.payLoad }];
+      return [...state, { pageNumber: action.payload }];
     case "INPUTNAME":
-      return [...state, { inputName: action.pageCount }];
+      return [...state, { inputName: action.payload }];
     case "SEARCHINPUT":
-      return [...state, { pageCount: action.pageCount }];
+      return [...state, { pageCount: action.payload }];
     default:
       break;
   }
@@ -61,6 +60,7 @@ function App() {
   });
   const ACTIONS = {
     newsData: "NEWSDATA",
+    weatherData: "WEATHERDATA",
     weatherCity: "WEATHERCITY",
     defaultNews: "DEFAULTNEWS",
     headerResponse: "HEADERRESPONSE",
@@ -68,6 +68,7 @@ function App() {
     inputNumber: "INPUTNAME",
     searchInput: "SEARCHINPUT",
   };
+
   const handleResponse = () => {
     setHeaderResponse(() => !headerResponse);
     if (headerResponse) {
@@ -96,13 +97,12 @@ function App() {
   useEffect(() => {
     const fetchNews = async () => {
       const api = await fetch(
-        `https://gnews.io/api/v4/${defaultNews}token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en`
+        `https://gnews.io/api/v4/${state.defaultNews}token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en`
       );
       const parse = await api.json();
       if (parse) {
         console.log(parse);
-        dispatch({ type: "NEWSDATA", payload: parse?.articles?.sclice(0.1) });
-        setNewsData(parse?.articles?.slice(0, 10));
+        dispatch({ type: "NEWSDATA", payload: parse?.articles?.slice(0, 10) });
       } else {
         console.log("still loading");
       }
@@ -126,11 +126,11 @@ function App() {
     };
 
     fetch(
-      `https://weatherapi-com.p.rapidapi.com/current.json?q=${weatherCity}`,
+      `https://weatherapi-com.p.rapidapi.com/current.json?q=${state.weatherCity}`,
       options
     )
       .then((response) => response.json())
-      .then((response) => dispatch({ type: "WEATHERDATA", payLoad: response }))
+      .then((response) => dispatch({ type: "WEATHERDATA", payload: response }))
       .catch((err) => console.error(err));
   }, [defaultNews, weatherCity]);
 
