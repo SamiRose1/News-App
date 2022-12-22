@@ -42,25 +42,6 @@ function App() {
   const [newsData, setNewsData] = useState([]);
   const [weatherData, setweatherData] = useState([]);
   const [weatherCity, setWeatherCity] = useState("edmonton");
-  const [defaultNews, setDefaultNews] = useState("top-headlines?");
-  const [headerResponse, setHeaderResponse] = useState(false);
-
-  const handleResponse = () => {
-    setHeaderResponse(() => !headerResponse);
-    if (headerResponse) {
-      document.querySelector(".headerContainer").classList.remove("expand");
-      document.querySelector(".weatherLink").classList.remove("align");
-      document.querySelector(".newsLink").classList.remove("align");
-      document.querySelector(".form").classList.remove("align");
-    } else if (!headerResponse) {
-      //////////
-      document.querySelector(".weatherLink").classList.add("align");
-      document.querySelector(".newsLink").classList.add("align");
-      document.querySelector(".form").classList.add("align");
-      document.querySelector(".headerContainer").classList.add("expand");
-    }
-  };
-
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState({
     newsSearch: "",
@@ -73,12 +54,11 @@ function App() {
   useEffect(() => {
     const fetchNews = async () => {
       const api = await fetch(
-        `https://gnews.io/api/v4/${defaultNews}token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en`
+        "https://gnews.io/api/v4/top-headlines?token=fcb3d604f8dd7d68bdc2bd6e460d0f28&lang=en"
       );
       const parse = await api.json();
       if (parse) {
-        console.log(parse);
-        setNewsData(parse?.articles?.slice(0, 10));
+        setNewsData(parse?.articles?.slice(0, 6));
       } else {
         console.log("still loading");
       }
@@ -159,8 +139,7 @@ function App() {
   let inputName;
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setInputName(name);
-    console.log(inputName);
+    inputName = name;
     setSearchInput(() => {
       return {
         [name]: value,
@@ -173,7 +152,7 @@ function App() {
       setWeatherCity(searchInput.weatherSearch);
     }
     if (searchInput.newsSearch) {
-      setDefaultNews(`search?q=${searchInput.newsSearch}&`);
+      console.log("handle news search");
     }
     dispatch({
       type: "SEARCHINPUT",
@@ -214,8 +193,6 @@ function App() {
         setSearchInput={state.searchInput}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
-        headerResponse={headerResponse}
-        handleResponse={handleResponse}
       />
       <Routes>
         <Route
