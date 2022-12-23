@@ -1,6 +1,7 @@
 import React from "react";
 
-const Weather = ({ current, location }) => {
+const Weather = ({ weatherData }) => {
+  const { location, current } = weatherData;
   return (
     <div className="weatherContainer">
       <div className="weatherDataContainer">
