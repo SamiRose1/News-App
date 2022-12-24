@@ -137,6 +137,9 @@
   font-weight: lighter;
   letter-spacing: 1px;
 }
+.description {
+  font-weight: 500;
+}
 
 .title {
   font-size: 25px;
@@ -246,6 +249,15 @@
   letter-spacing: 1px;
 }
 
+.link {
+  background-color: black;
+  padding: 5px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 10px;
+  color: white;
+}
+
 .form button:hover {
   background-color: aliceblue;
   color: black;
@@ -350,7 +362,7 @@
   /* news */
   .newsArticle img {
     width: 90%;
-    height: 150px;
+    height: 90%;
     border-radius: 5px;
   }
   .newsArticle {
@@ -365,7 +377,8 @@
   }
 
   .description,
-  .title {
+  .title,
+  .content {
     width: 80%;
     padding: 5px;
     border-radius: 20px;
@@ -374,14 +387,28 @@
     background-color: aliceblue;
     font-size: 100%;
   }
+  .footer p {
+    font-size: 100%;
+  }
+  .description {
+    font-weight: 500;
+  }
+
   .title {
     font-weight: lighter;
     letter-spacing: 1px;
   }
-  .readMoreLink,
   .sourceLink {
     font-size: 100%;
     width: 80%;
+  }
+  .link {
+    background-color: black;
+    padding: 2px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 8px;
+    color: white;
   }
   .readMoreLink a {
     font-size: 70%;
@@ -451,5 +478,26 @@
     color: rgb(193, 195, 197);
     font-size: 100%;
     letter-spacing: 1px;
+  }
+}
+@media screen and (max-width: 250px) {
+  .newsArticle img {
+    width: 90%;
+    height: fit-content;
+    border-radius: 5px;
+    object-fit: scale-down;
+  }
+  .link {
+    font-size: 10%;
+    width: 50% auto;
+  }
+  .content,
+  .description,
+  .title,
+  .source {
+    font-size: 70%;
+  }
+  .description {
+    font-weight: 500;
   }
 }

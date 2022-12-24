@@ -6,8 +6,8 @@ const Footer = () => {
     <div className="footer">
       <img src={Logo} alt="" className="logo" />
       <p>
-        ©Copyright {new Date().getFullYear()} Seim Yemane. Don't claim as your
-        own, use for your portfolio or learning purposes only.
+        {new Date().getFullYear()} ©Copyright by Seim Yemane. Use for learning
+        or your portfolio. Don't use to teach. Don't claim as your own product.
       </p>
     </div>
   );

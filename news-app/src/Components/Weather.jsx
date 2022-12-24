@@ -1,6 +1,7 @@
 import React from "react";
 
 const Weather = ({ weatherData }) => {
+  // the weather object comes with two more objects that's why I destructed it
   const { location, current } = weatherData;
   return (
     <div className="weatherContainer">

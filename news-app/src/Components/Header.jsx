@@ -9,6 +9,7 @@ const Header = ({
   handleSubmit,
   icon,
   handleResponse,
+  inputValue,
 }) => {
   return (
     <header className="headerContainer">
@@ -31,8 +32,8 @@ const Header = ({
           <input
             type="text"
             className="input"
-            name={searchInput.searchInput.inputName}
-            value={searchInput.searchInput.inputName}
+            name={searchInput.inputName}
+            value={inputValue}
             onChange={handleChange}
           />
           <button onClick={handleSubmit}>Search</button>
